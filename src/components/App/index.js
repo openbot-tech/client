@@ -10,7 +10,10 @@ const client = io.connect('http://localhost:1337')
 class App extends React.Component {
   componentDidMount() {
     const { addData } = this.props
-    client.on('data', msg => addData(parseMarketData(msg.marketData)))
+    client.on('data', (msg) => {
+      console.log('here', msg)
+      addData(parseMarketData(msg.marketData))
+    })
   }
 
   render() {

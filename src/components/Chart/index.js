@@ -14,7 +14,6 @@ import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import {
   CrossHairCursor,
   EdgeIndicator,
-  CurrentCoordinate,
   MouseCoordinateX,
   MouseCoordinateY,
 } from 'react-stockcharts/lib/coordinates'
@@ -24,7 +23,6 @@ import {
   OHLCTooltip,
   MovingAverageTooltip,
 } from 'react-stockcharts/lib/tooltip'
-import { ema } from 'react-stockcharts/lib/indicator'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import {
   Label,
@@ -35,29 +33,19 @@ import { last } from 'react-stockcharts/lib/utils'
 class MovingAverageCrossOverAlgorithmV1 extends Component {
   render() {
     const { type, data: initialData, width, ratio } = this.props
-    const ema20 = ema()
-      .id(0)
-      .options({ windowSize: 13 })
-      .merge((d, c) => { d.ema20 = c })
-      .accessor(d => d.ema20)
-
-    const ema50 = ema()
-      .id(2)
-      .options({ windowSize: 50 })
-      .merge((d, c) => { d.ema50 = c })
-      .accessor(d => d.ema50)
 
     const ema100 = {
-      calculate: data => data.map(obj => ({ ...obj, ema100: 54 })),
+      calculate: data => data.map(obj => ({ ...obj, ema100: 250 })),
       accessor: data => data && data.ema100,
     }
 
     const margin = { left: 80, right: 80, top: 30, bottom: 50 }
     const height = 400
 
-    const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
+    const [yAxisLabelX, yAxisLabelY] =
+      [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
 
-    const calculatedData = ema100.calculate(ema50(ema20(initialData)))
+    const calculatedData = ema100.calculate(initialData)
     const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d.date)
     const {
@@ -87,7 +75,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
       >
         <Chart
           id={1}
-          yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor(), ema100.accessor]}
+          yExtents={[d => [d.high, d.low], ema100.accessor]}
           padding={{ top: 10, bottom: 20 }}
         >
           <XAxis axisAt="bottom" orient="bottom" />
@@ -120,11 +108,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <CandlestickSeries />
-          <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
-          <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
-          <LineSeries yAccessor={ema100.accessor} stroke={ema50.stroke()} />
-          <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-          <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+          <LineSeries yAccessor={ema100.accessor} stroke="#000" />
           <EdgeIndicator
             itemType="last"
             orient="right"
@@ -139,16 +123,10 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
             origin={[-38, 15]}
             options={[
               {
-                yAccessor: ema20.accessor(),
+                yAccessor: ema100.accessor,
                 type: 'EMA',
-                stroke: ema20.stroke(),
-                windowSize: ema20.options().windowSize,
-              },
-              {
-                yAccessor: ema50.accessor(),
-                type: 'EMA',
-                stroke: ema50.stroke(),
-                windowSize: ema50.options().windowSize,
+                stroke: '#000',
+                windowSize: 7,
               },
             ]}
           />
