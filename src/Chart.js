@@ -26,11 +26,8 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import algo from "react-stockcharts/lib/algorithm";
 import {
 	Label,
-	Annotate,
-	LabelAnnotation,
 } from "react-stockcharts/lib/annotation";
 import { last } from "react-stockcharts/lib/utils";
 
@@ -48,47 +45,19 @@ class MovingAverageCrossOverAlgorithmV1 extends React.Component {
 			.id(2)
 			.options({ windowSize: 50 })
 			.merge((d, c) => { d.ema50 = c; })
-			.accessor(d => d.ema50);
+      .accessor(d => d.ema50);
 
-		const buySell = algo()
-			.windowSize(2)
-			.accumulator(([prev, now]) => {
-				const { ema20: prevShortTerm, ema50: prevLongTerm } = prev;
-				const { ema20: nowShortTerm, ema50: nowLongTerm } = now;
-				if (prevShortTerm < prevLongTerm && nowShortTerm > nowLongTerm) return "LONG";
-				if (prevShortTerm > prevLongTerm && nowShortTerm < nowLongTerm) return "SHORT";
-			})
-			.merge((d, c) => { d.longShort = c; });
-
-		const defaultAnnotationProps = {
-			fontFamily: "Glyphicons Halflings",
-			fontSize: 20,
-			opacity: 0.8,
-			onClick: console.log.bind(console),
-		};
-
-		const longAnnotationProps = {
-			...defaultAnnotationProps,
-			fill: "#006517",
-			text: "\ue093",
-			y: ({ yScale, datum }) => yScale(datum.low) + 20,
-			tooltip: "Go long",
-		};
-
-		const shortAnnotationProps = {
-			...defaultAnnotationProps,
-			fill: "#E20000",
-			text: "\ue094",
-			y: ({ yScale, datum }) => yScale(datum.high),
-			tooltip: "Go short",
-		};
+    const ema100 = {
+      calculate: data => data.map(obj => ({ ...obj, ema100: 54 })),
+      accessor: data => data && data.ema100
+    }
 
 		const margin = { left: 80, right: 80, top: 30, bottom: 50 };
 		const height = 400;
 
 		const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
 
-		const calculatedData = buySell(ema50(ema20(initialData)));
+    const calculatedData = ema100.calculate(ema50(ema20(initialData)));
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -116,7 +85,7 @@ class MovingAverageCrossOverAlgorithmV1 extends React.Component {
 				xExtents={xExtents}
 			>
 				<Chart id={1}
-					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
+					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor(), ema100.accessor]}
 					padding={{ top: 10, bottom: 20 }}
 				>
 					<XAxis axisAt="bottom" orient="bottom"/>
@@ -141,7 +110,7 @@ class MovingAverageCrossOverAlgorithmV1 extends React.Component {
 					<CandlestickSeries />
 					<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
 					<LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
-
+          <LineSeries yAccessor={ema100.accessor} stroke={ema50.stroke()}/>
 					<CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
 					<CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
 					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
@@ -166,11 +135,6 @@ class MovingAverageCrossOverAlgorithmV1 extends React.Component {
 							},
 						]}
 					/>
-
-					<Annotate with={LabelAnnotation} when={d => d.longShort === "LONG"}
-						usingProps={longAnnotationProps} />
-					<Annotate with={LabelAnnotation} when={d => d.longShort === "SHORT"}
-						usingProps={shortAnnotationProps} />
 
 				</Chart>
 				<CrossHairCursor />
