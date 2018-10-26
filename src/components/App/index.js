@@ -1,24 +1,21 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-// import io from 'socket.io-client'
+import io from 'socket.io-client'
 import Chart from '../Chart/container'
-import { getData } from '../../utils'
+import { parseMarketData } from '../../utils'
 
-// const client = io.connect('http://localhost:1337')
+const client = io.connect('http://localhost:1337')
 
 class App extends React.Component {
   componentDidMount() {
     const { addData } = this.props
-    // client.on('data', msg => console.info('hey', msg))
-    getData().then((data) => {
-      addData(data)
-    })
+    client.on('data', msg => addData(parseMarketData(msg.marketData)))
   }
 
   render() {
     const { data } = this.props
-    if (data.length === 0) {
+    if (data.length < 2) {
       return <div>Loading...</div>
     }
     return (

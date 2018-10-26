@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import { format } from 'd3-format'
@@ -31,129 +31,133 @@ import {
 } from 'react-stockcharts/lib/annotation'
 import { last } from 'react-stockcharts/lib/utils'
 
-const MovingAverageCrossOverAlgorithmV1 = ({ type, data: initialData, width, ratio }) => {
-  const ema20 = ema()
-    .id(0)
-    .options({ windowSize: 13 })
-    .merge((d, c) => { d.ema20 = c })
-    .accessor(d => d.ema20)
+// eslint-disable-next-line react/prefer-stateless-function
+class MovingAverageCrossOverAlgorithmV1 extends Component {
+  render() {
+    const { type, data: initialData, width, ratio } = this.props
+    const ema20 = ema()
+      .id(0)
+      .options({ windowSize: 13 })
+      .merge((d, c) => { d.ema20 = c })
+      .accessor(d => d.ema20)
 
-  const ema50 = ema()
-    .id(2)
-    .options({ windowSize: 50 })
-    .merge((d, c) => { d.ema50 = c })
-    .accessor(d => d.ema50)
+    const ema50 = ema()
+      .id(2)
+      .options({ windowSize: 50 })
+      .merge((d, c) => { d.ema50 = c })
+      .accessor(d => d.ema50)
 
-  const ema100 = {
-    calculate: data => data.map(obj => ({ ...obj, ema100: 54 })),
-    accessor: data => data && data.ema100,
-  }
+    const ema100 = {
+      calculate: data => data.map(obj => ({ ...obj, ema100: 54 })),
+      accessor: data => data && data.ema100,
+    }
 
-  const margin = { left: 80, right: 80, top: 30, bottom: 50 }
-  const height = 400
+    const margin = { left: 80, right: 80, top: 30, bottom: 50 }
+    const height = 400
 
-  const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
+    const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
 
-  const calculatedData = ema100.calculate(ema50(ema20(initialData)))
-  const xScaleProvider = discontinuousTimeScaleProvider
-    .inputDateAccessor(d => d.date)
-  const {
-    data,
-    xScale,
-    xAccessor,
-    displayXAccessor,
-  } = xScaleProvider(calculatedData)
+    const calculatedData = ema100.calculate(ema50(ema20(initialData)))
+    const xScaleProvider = discontinuousTimeScaleProvider
+      .inputDateAccessor(d => d.date)
+    const {
+      data,
+      xScale,
+      xAccessor,
+      displayXAccessor,
+    } = xScaleProvider(calculatedData)
 
-  const start = xAccessor(last(data))
-  const end = xAccessor(data[Math.max(0, data.length - 150)])
-  const xExtents = [start, end]
+    const start = xAccessor(last(data))
+    const end = xAccessor(data[Math.max(0, data.length - 150)])
+    const xExtents = [start, end]
 
-  return (
-    <ChartCanvas
-      height={height}
-      width={width}
-      ratio={ratio}
-      margin={margin}
-      type={type}
-      seriesName="MSFT"
-      data={data}
-      xScale={xScale}
-      xAccessor={xAccessor}
-      displayXAccessor={displayXAccessor}
-      xExtents={xExtents}
-    >
-      <Chart
-        id={1}
-        yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor(), ema100.accessor]}
-        padding={{ top: 10, bottom: 20 }}
+    return (
+      <ChartCanvas
+        height={height}
+        width={width}
+        ratio={ratio}
+        margin={margin}
+        type={type}
+        seriesName="MSFT"
+        data={data}
+        xScale={xScale}
+        xAccessor={xAccessor}
+        displayXAccessor={displayXAccessor}
+        xExtents={xExtents}
       >
-        <XAxis axisAt="bottom" orient="bottom" />
+        <Chart
+          id={1}
+          yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor(), ema100.accessor]}
+          padding={{ top: 10, bottom: 20 }}
+        >
+          <XAxis axisAt="bottom" orient="bottom" />
 
-        <Label
-          x={(width - margin.left - margin.right) / 2}
-          y={height - 45}
-          fontSize="12"
-          text="XAxis Label here"
-        />
+          <Label
+            x={(width - margin.left - margin.right) / 2}
+            y={height - 45}
+            fontSize="12"
+            text="XAxis Label here"
+          />
 
-        <YAxis axisAt="right" orient="right" ticks={5} />
+          <YAxis axisAt="right" orient="right" ticks={5} />
 
-        <Label
-          x={yAxisLabelX}
-          y={yAxisLabelY}
-          rotate={-90}
-          fontSize="12"
-          text="YAxis Label here"
-        />
-        <MouseCoordinateX
-          at="bottom"
-          orient="bottom"
-          displayFormat={timeFormat('%Y-%m-%d')}
-        />
-        <MouseCoordinateY
-          at="right"
-          orient="right"
-          displayFormat={format('.2f')}
-        />
+          <Label
+            x={yAxisLabelX}
+            y={yAxisLabelY}
+            rotate={-90}
+            fontSize="12"
+            text="YAxis Label here"
+          />
+          <MouseCoordinateX
+            at="bottom"
+            orient="bottom"
+            displayFormat={timeFormat('%Y-%m-%d')}
+          />
+          <MouseCoordinateY
+            at="right"
+            orient="right"
+            displayFormat={format('.2f')}
+          />
 
-        <CandlestickSeries />
-        <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
-        <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
-        <LineSeries yAccessor={ema100.accessor} stroke={ema50.stroke()} />
-        <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-        <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
-        <EdgeIndicator
-          itemType="last"
-          orient="right"
-          edgeAt="right"
-          yAccessor={d => d.close}
-          fill={d => (d.close > d.open ? '#6BA583' : '#FF0000')}
-        />
+          <CandlestickSeries />
+          <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
+          <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
+          <LineSeries yAccessor={ema100.accessor} stroke={ema50.stroke()} />
+          <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
+          <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+          <EdgeIndicator
+            itemType="last"
+            orient="right"
+            edgeAt="right"
+            yAccessor={d => d.close}
+            fill={d => (d.close > d.open ? '#6BA583' : '#FF0000')}
+          />
 
-        <OHLCTooltip origin={[-40, 0]} />
-        <MovingAverageTooltip
-          onClick={e => console.log(e)}
-          origin={[-38, 15]}
-          options={[
-            {
-              yAccessor: ema20.accessor(),
-              type: 'EMA',
-              stroke: ema20.stroke(),
-              windowSize: ema20.options().windowSize,
-            },
-            {
-              yAccessor: ema50.accessor(),
-              type: 'EMA',
-              stroke: ema50.stroke(),
-              windowSize: ema50.options().windowSize,
-            },
-          ]}
-        />
+          <OHLCTooltip origin={[-40, 0]} />
+          <MovingAverageTooltip
+            onClick={e => console.log(e)}
+            origin={[-38, 15]}
+            options={[
+              {
+                yAccessor: ema20.accessor(),
+                type: 'EMA',
+                stroke: ema20.stroke(),
+                windowSize: ema20.options().windowSize,
+              },
+              {
+                yAccessor: ema50.accessor(),
+                type: 'EMA',
+                stroke: ema50.stroke(),
+                windowSize: ema50.options().windowSize,
+              },
+            ]}
+          />
 
-      </Chart>
-      <CrossHairCursor />
-    </ChartCanvas>
-  )
+        </Chart>
+        <CrossHairCursor />
+      </ChartCanvas>
+    )
+  }
 }
 
 MovingAverageCrossOverAlgorithmV1.propTypes = {

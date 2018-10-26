@@ -1,24 +1,14 @@
-import { tsvParse } from 'd3-dsv'
 import { timeParse } from 'd3-time-format'
 
-const parseData = parse =>
-  (data) => {
-    const updatedData = {}
-    updatedData.date = parse(data.date)
-    updatedData.open = +data.open
-    updatedData.high = +data.high
-    updatedData.low = +data.low
-    updatedData.close = +data.close
-    updatedData.volume = +data.volume
+const parseDate = timeParse('%Q')
 
-    return updatedData
-  }
+export const getLast = arr => [...arr].pop()
 
-const parseDate = timeParse('%Y-%m-%d')
-
-export const getData = () => {
-  const promiseMSFT = fetch('https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv')
-    .then(response => response.text())
-    .then(data => tsvParse(data, parseData(parseDate)))
-  return promiseMSFT
-}
+export const parseMarketData = data => ({
+  close: getLast(data.close),
+  date: parseDate(getLast(data.date)),
+  high: getLast(data.high),
+  low: getLast(data.low),
+  open: getLast(data.open),
+  volume: getLast(data.volume),
+})

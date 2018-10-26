@@ -4,7 +4,7 @@ const data = (state = [], action) => {
   switch (action.type) {
     case 'ADD_DATA': return [
       ...state,
-      ...action.payload,
+      action.payload,
     ]
     default:
       return state
