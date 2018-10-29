@@ -7,8 +7,13 @@ import { MovingAverageTooltip } from 'react-stockcharts/lib/tooltip'
 const Overlays = ({ indicatorOverlays }) => (
   <Fragment>
     {
-      indicatorOverlays.map(overlay =>
-        <LineSeries key={overlay.name} yAccessor={overlay.accessor} stroke={overlay.stroke} />)
+      indicatorOverlays.map(overlay => (
+        <LineSeries
+          key={`${overlay.indicator}${overlay.options.join('')}`}
+          yAccessor={overlay.accessor}
+          stroke={overlay.stroke}
+        />
+      ))
     }
     {
       indicatorOverlays.length > 0 && (

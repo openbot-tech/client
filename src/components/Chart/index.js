@@ -106,6 +106,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
             : { showTicks: false, outerTickSize: 0 }
           return (
             <Chart
+              key={`${indicator.indicator}${indicator.options.join('')}`}
               id={idx + 2}
               yExtents={indicator.accessor}
               height={150}
