@@ -1,9 +1,9 @@
 
 import { combineReducers } from 'redux'
 import data from './data'
-import overlays from './overlays'
+import indicators from './indicators'
 
 export default combineReducers({
   data,
-  overlays,
+  indicators,
 })

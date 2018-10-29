@@ -8,7 +8,6 @@ import { timeFormat } from 'd3-time-format'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
   CandlestickSeries,
-  LineSeries,
 } from 'react-stockcharts/lib/series'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import {
@@ -21,19 +20,17 @@ import {
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import {
   OHLCTooltip,
-  MovingAverageTooltip,
 } from 'react-stockcharts/lib/tooltip'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import {
   Label,
 } from 'react-stockcharts/lib/annotation'
 import { last } from 'react-stockcharts/lib/utils'
-
+import Overlays from './overlay'
 // eslint-disable-next-line react/prefer-stateless-function
 class MovingAverageCrossOverAlgorithmV1 extends Component {
   render() {
     const { type, data: initialData, width, ratio, overlays } = this.props
-
     const indicatorOverlays = overlays.map(({ name, ...options }) =>
       ({ accessor: data => data && data[name], ...options }))
 
@@ -106,25 +103,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <CandlestickSeries />
-          {
-            indicatorOverlays.map(overlay =>
-              <LineSeries key={overlay.name} yAccessor={overlay.accessor} stroke={overlay.stroke} />)
-          }
-          {
-            indicatorOverlays.length > 0 && (
-              <MovingAverageTooltip
-                onClick={e => console.log(e)}
-                origin={[-38, 15]}
-                options={indicatorOverlays.map(overlay => ({
-                  yAccessor: overlay.accessor,
-                  type: overlay.indicator,
-                  stroke: overlay.stroke,
-                  windowSize: overlay.options[0], // TODO this should be more dynamic
-                }))
-                }
-              />
-            )
-          }
+          <Overlays indicatorOverlays={indicatorOverlays} />
           <EdgeIndicator
             itemType="last"
             orient="right"
@@ -146,6 +125,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
 MovingAverageCrossOverAlgorithmV1.propTypes = {
   data: PropTypes.array.isRequired, // eslint-disable-line
   overlays: PropTypes.array.isRequired, // eslint-disable-line
+  indicators: PropTypes.array.isRequired, // eslint-disable-line
   width: PropTypes.number.isRequired,
   ratio: PropTypes.number.isRequired,
   type: PropTypes.oneOf(['svg', 'hybrid']),

@@ -1,12 +1,13 @@
-const ADD_DATA = 'ADD_DATA'
-const ADD_OVERLAYS = 'ADD_OVERLAYS'
+export const ADD_DATA = 'ADD_DATA'
+export const ADD_INDICATORS = 'ADD_INDICATORS'
 
 export const addData = payload => ({
   type: ADD_DATA,
   payload,
 })
 
-export const addOverlays = payload => ({
-  type: ADD_OVERLAYS,
+
+export const addIndicators = payload => ({
+  type: ADD_INDICATORS,
   payload,
 })

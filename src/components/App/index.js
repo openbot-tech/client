@@ -9,10 +9,10 @@ const client = io.connect('http://localhost:1337')
 
 class App extends React.Component {
   componentDidMount() {
-    const { addData, addOverlays } = this.props
+    const { addData, addIndicators } = this.props
     client.on('data', (msg) => {
-      const { data, overlays } = parseData(msg)
-      addOverlays(overlays)
+      const { data, ...indicators } = parseData(msg)
+      addIndicators(indicators)
       addData(data)
     })
   }
@@ -31,7 +31,7 @@ class App extends React.Component {
 App.propTypes = {
   data: PropTypes.array.isRequired, // eslint-disable-line
   addData: PropTypes.func.isRequired,
-  addOverlays: PropTypes.func.isRequired,
+  addIndicators: PropTypes.func.isRequired,
 }
 
 export default App
