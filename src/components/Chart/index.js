@@ -34,8 +34,8 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
   render() {
     const { type, data: initialData, width, ratio, overlays } = this.props
 
-    const indicatorOverlays = overlays.map(({ stroke, name, indicator }) =>
-      ({ accessor: data => data && data[name], stroke, indicator }))
+    const indicatorOverlays = overlays.map(({ name, ...options }) =>
+      ({ accessor: data => data && data[name], ...options }))
 
     const margin = { left: 80, right: 80, top: 30, bottom: 50 }
     const height = 400
@@ -45,21 +45,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
 
     const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d.date)
-    /*
-              { indicatorOverlays.length > 0 && (
-            <MovingAverageTooltip
-              onClick={e => console.log(e)}
-              origin={[-38, 15]}
-              options={indicatorOverlays.map(overlay => ({
-                yAccessor: overlay.accessor,
-                type: overlay.indicator,
-                stroke: overlay.stroke,
-                windowSize: overlay.options.join(', '),
-              }))
-              }
-            />
-          )}
-    */
+
     const {
       data,
       xScale,
@@ -121,7 +107,23 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
 
           <CandlestickSeries />
           {
-            indicatorOverlays.map(overlay => <LineSeries key={overlay.name} yAccessor={overlay.accessor} stroke={overlay.stroke} />)
+            indicatorOverlays.map(overlay =>
+              <LineSeries key={overlay.name} yAccessor={overlay.accessor} stroke={overlay.stroke} />)
+          }
+          {
+            indicatorOverlays.length > 0 && (
+              <MovingAverageTooltip
+                onClick={e => console.log(e)}
+                origin={[-38, 15]}
+                options={indicatorOverlays.map(overlay => ({
+                  yAccessor: overlay.accessor,
+                  type: overlay.indicator,
+                  stroke: overlay.stroke,
+                  windowSize: overlay.options[0],
+                }))
+                }
+              />
+            )
           }
           <EdgeIndicator
             itemType="last"
