@@ -8,7 +8,9 @@
     "eslint-import-resolver-webpack": "^0.10.1",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.11.1"
+    "eslint-plugin-react": "^7.11.1",
+    "lint-staged": "^8.0.0",
+    "pre-commit": "^1.2.2"
   },
   "dependencies": {
     "d3-dsv": "^1.0.10",
@@ -28,7 +30,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:staged": "jest",
     "eject": "react-scripts eject",
+    "lint:staged": "lint-staged",
     "fix": "eslint --fix . --ext .js src"
   },
   "eslintConfig": {
@@ -39,5 +43,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
+  ],
+  "pre-commit": [
+    "lint:staged",
+    "test:staged",
   ]
 }
