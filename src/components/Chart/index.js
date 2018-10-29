@@ -119,7 +119,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
                   yAccessor: overlay.accessor,
                   type: overlay.indicator,
                   stroke: overlay.stroke,
-                  windowSize: overlay.options[0],
+                  windowSize: overlay.options[0], // TODO this should be more dynamic
                 }))
                 }
               />
