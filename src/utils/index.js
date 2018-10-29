@@ -15,7 +15,7 @@ const parseDate = timeParse('%s')
 export const getLast = arr => [...arr].pop()
 
 
-export const parseMarketData = (data, indicators = {}) => ({
+export const parseMarketData = (data, indicators = {}, signal = {}) => ({
   close: getLast(data.close),
   date: parseDate(getLast(data.date)),
   high: getLast(data.high),
@@ -23,6 +23,7 @@ export const parseMarketData = (data, indicators = {}) => ({
   open: getLast(data.open),
   volume: getLast(data.volume),
   ...indicators,
+  ...signal,
 })
 
 
@@ -51,11 +52,12 @@ export const parseIndicatorOptions = indicatorData =>
 
 
 export const parseData = (data) => {
-  const indicatorsData = parseIndicators(data.indicatorData)
-  const indicatorOptions = parseIndicatorOptions(data.indicatorData)
+  const { indicatorData, marketData, signal } = data
+  const indicatorsData = parseIndicators(indicatorData)
+  const indicatorOptions = parseIndicatorOptions(indicatorData)
   const overlayIndicatorOptions = getIndicatorsWithType(indicatorOptions, 'overlay')
   const chartIndicatorOptions = getIndicatorsWithType(indicatorOptions, 'indicator')
-  const dataWithIndicators = parseMarketData(data.marketData, indicatorsData)
+  const dataWithIndicators = parseMarketData(marketData, indicatorsData, { signal })
   return { data: dataWithIndicators, overlays: overlayIndicatorOptions, indicators: chartIndicatorOptions }
 }
 

@@ -25,6 +25,12 @@ import {
 } from 'react-stockcharts/lib/tooltip'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import { last } from 'react-stockcharts/lib/utils'
+import {
+  buyPath,
+  sellPath,
+  Annotate,
+  SvgPathAnnotation,
+} from 'react-stockcharts/lib/annotation'
 import { createChartIndicatorObject } from '../../utils'
 import Overlays from './overlay'
 // eslint-disable-next-line react/prefer-stateless-function
@@ -40,6 +46,20 @@ class ChartWrapper extends Component {
 
     const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d.date)
+
+    const longAnnotationProps = {
+      y: ({ yScale, datum }) => yScale(datum.low),
+      fill: '#006517',
+      path: buyPath,
+      tooltip: 'Buy',
+    }
+
+    const shortAnnotationProps = {
+      y: ({ yScale, datum }) => yScale(datum.high),
+      fill: '#FF0000',
+      path: sellPath,
+      tooltip: 'Sell',
+    }
 
     const {
       data,
@@ -98,6 +118,17 @@ class ChartWrapper extends Component {
           />
 
           <OHLCTooltip origin={[-40, 0]} />
+
+          <Annotate
+            with={SvgPathAnnotation}
+            when={({ signal }) => signal === 'buy'}
+            usingProps={longAnnotationProps}
+          />
+          <Annotate
+            with={SvgPathAnnotation}
+            when={({ signal }) => signal === 'sell'}
+            usingProps={shortAnnotationProps}
+          />
         </Chart>
 
         { indicatorsOptions.length > 0 && indicatorsOptions.map((indicator, idx) => {

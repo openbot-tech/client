@@ -34,7 +34,18 @@ describe('Utils', () => {
       volume: 6,
       sma20: 2,
     }
+    const expectedWithSignal = {
+      close: 2,
+      date: new Date(1540817843 * 1000),
+      high: 3,
+      low: 4,
+      open: 5,
+      volume: 6,
+      sma20: 2,
+      signal: 'buy',
+    }
     expect(parseMarketData(mockData, mockIndicators)).toEqual(expected)
+    expect(parseMarketData(mockData, mockIndicators, { signal: 'buy' })).toEqual(expectedWithSignal)
   })
   it('Should indicator with defined type', () => {
     const mockIndicators = [{ type: 'overlay' }, { type: 'indicator' }]
