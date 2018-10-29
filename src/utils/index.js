@@ -58,3 +58,6 @@ export const parseData = (data) => {
   const dataWithIndicators = parseMarketData(data.marketData, indicatorsData)
   return { data: dataWithIndicators, overlays: overlayIndicatorOptions, indicators: chartIndicatorOptions }
 }
+
+export const createChartIndicatorObject = arr => arr.map(({ name, ...options }) =>
+  ({ accessor: data => data && data[name], ...options }))

@@ -8,6 +8,7 @@ import { timeFormat } from 'd3-time-format'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
   CandlestickSeries,
+  LineSeries,
 } from 'react-stockcharts/lib/series'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import {
@@ -20,25 +21,22 @@ import {
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import {
   OHLCTooltip,
+  SingleValueTooltip,
 } from 'react-stockcharts/lib/tooltip'
 import { fitWidth } from 'react-stockcharts/lib/helper'
-import {
-  Label,
-} from 'react-stockcharts/lib/annotation'
 import { last } from 'react-stockcharts/lib/utils'
+import { createChartIndicatorObject } from '../../utils'
 import Overlays from './overlay'
 // eslint-disable-next-line react/prefer-stateless-function
 class MovingAverageCrossOverAlgorithmV1 extends Component {
   render() {
-    const { type, data: initialData, width, ratio, overlays } = this.props
-    const indicatorOverlays = overlays.map(({ name, ...options }) =>
-      ({ accessor: data => data && data[name], ...options }))
+    const { type, data: initialData, width, ratio, overlays, indicators } = this.props
+
+    const indicatorOverlayOptions = createChartIndicatorObject(overlays)
+    const indicatorsOptions = createChartIndicatorObject(indicators)
 
     const margin = { left: 80, right: 80, top: 30, bottom: 50 }
-    const height = 400
-
-    const [yAxisLabelX, yAxisLabelY] =
-      [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
+    const height = 310 + (indicators.length * 180)
 
     const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d.date)
@@ -70,27 +68,14 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
       >
         <Chart
           id={1}
-          yExtents={[d => [d.high, d.low, ...indicatorOverlays]]}
+          height={300}
+          yExtents={[d => [d.high, d.low, ...indicatorOverlayOptions]]}
           padding={{ top: 10, bottom: 20 }}
         >
-          <XAxis axisAt="bottom" orient="bottom" />
-
-          <Label
-            x={(width - margin.left - margin.right) / 2}
-            y={height - 45}
-            fontSize="12"
-            text="XAxis Label here"
-          />
+          <XAxis axisAt="bottom" orient="bottom" showTicks={false} outerTickSize={0} />
 
           <YAxis axisAt="right" orient="right" ticks={5} />
 
-          <Label
-            x={yAxisLabelX}
-            y={yAxisLabelY}
-            rotate={-90}
-            fontSize="12"
-            text="YAxis Label here"
-          />
           <MouseCoordinateX
             at="bottom"
             orient="bottom"
@@ -103,7 +88,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <CandlestickSeries />
-          <Overlays indicatorOverlays={indicatorOverlays} />
+          <Overlays indicatorOverlays={indicatorOverlayOptions} />
           <EdgeIndicator
             itemType="last"
             orient="right"
@@ -113,9 +98,45 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <OHLCTooltip origin={[-40, 0]} />
-
-
         </Chart>
+
+        { indicatorsOptions.length > 0 && indicatorsOptions.map((indicator, idx) => {
+          const xAxisProps = idx === indicatorsOptions.length - 1
+            ? {}
+            : { showTicks: false, outerTickSize: 0 }
+          return (
+            <Chart
+              id={idx + 2}
+              yExtents={indicator.accessor}
+              height={150}
+              origin={[0, idx === 0 ? 300 : ((idx * 150) + 300)]}
+              padding={{ top: 10, bottom: 20 }}
+            >
+              <XAxis
+                axisAt="bottom"
+                orient="bottom"
+                {...xAxisProps}
+              />
+              <YAxis axisAt="right" orient="right" ticks={5} />
+
+              <MouseCoordinateY
+                at="right"
+                orient="right"
+                displayFormat={format('.2f')}
+              />
+
+              <LineSeries yAccessor={indicator.accessor} stroke={indicator.stroke} />
+              <SingleValueTooltip
+                yAccessor={indicator.accessor}
+                yLabel={`${indicator.indicator} (${indicator.options.join(', ')})`}
+                yDisplayFormat={format('.2f')}
+                origin={[-40, 15]}
+              />
+            </Chart>
+          )
+        })
+        }
+
         <CrossHairCursor />
       </ChartCanvas>
     )
