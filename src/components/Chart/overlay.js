@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-
 import { LineSeries } from 'react-stockcharts/lib/series'
 import { MovingAverageTooltip } from 'react-stockcharts/lib/tooltip'
 
@@ -35,7 +34,12 @@ const Overlays = ({ indicatorOverlays }) => (
 )
 
 Overlays.propTypes = {
-  indicatorOverlays: PropTypes.array.isRequired, // eslint-disable-line
+  indicatorOverlays: PropTypes.arrayOf(PropTypes.shape({
+    accessor: PropTypes.func.isRequired,
+    options: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    stroke: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+  })).isRequired,
 }
 
 export default Overlays

@@ -28,7 +28,7 @@ import { last } from 'react-stockcharts/lib/utils'
 import { createChartIndicatorObject } from '../../utils'
 import Overlays from './overlay'
 // eslint-disable-next-line react/prefer-stateless-function
-class MovingAverageCrossOverAlgorithmV1 extends Component {
+class ChartWrapper extends Component {
   render() {
     const { type, data: initialData, width, ratio, overlays, indicators } = this.props
 
@@ -144,19 +144,35 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
   }
 }
 
-MovingAverageCrossOverAlgorithmV1.propTypes = {
-  data: PropTypes.array.isRequired, // eslint-disable-line
-  overlays: PropTypes.array.isRequired, // eslint-disable-line
-  indicators: PropTypes.array.isRequired, // eslint-disable-line
+const indicatorPropType = PropTypes.arrayOf(PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  stroke: PropTypes.string.isRequired,
+  indicator: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(PropTypes.number).isRequired,
+  type: PropTypes.string.isRequired,
+}))
+
+
+ChartWrapper.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({
+    close: PropTypes.number.isRequired,
+    date: PropTypes.instanceOf(Date).isRequired,
+    high: PropTypes.number.isRequired,
+    low: PropTypes.number.isRequired,
+    open: PropTypes.number.isRequired,
+    volume: PropTypes.number.isRequired,
+  })).isRequired,
+  overlays: indicatorPropType.isRequired,
+  indicators: indicatorPropType.isRequired,
   width: PropTypes.number.isRequired,
   ratio: PropTypes.number.isRequired,
   type: PropTypes.oneOf(['svg', 'hybrid']),
 }
 
-MovingAverageCrossOverAlgorithmV1.defaultProps = {
+ChartWrapper.defaultProps = {
   type: 'hybrid',
 }
 
-const MovingAverageCrossOverAlgorithmV1Width = fitWidth(MovingAverageCrossOverAlgorithmV1)
+const ChartWrapperWithWidth = fitWidth(ChartWrapper)
 
-export default MovingAverageCrossOverAlgorithmV1Width
+export default ChartWrapperWithWidth
