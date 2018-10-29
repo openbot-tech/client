@@ -1,6 +1,6 @@
 import { timeParse } from 'd3-time-format'
 
-const colors = [
+export const colors = [
   '#12EAEA',
   '#DB2763',
   '#B0DB43',
