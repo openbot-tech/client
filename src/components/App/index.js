@@ -3,16 +3,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import io from 'socket.io-client'
 import Chart from '../Chart/container'
-import { parseMarketData } from '../../utils'
+import { parseData } from '../../utils'
 
 const client = io.connect('http://localhost:1337')
 
 class App extends React.Component {
   componentDidMount() {
-    const { addData } = this.props
+    const { addData, addOverlays } = this.props
     client.on('data', (msg) => {
-      console.log('here', msg)
-      addData(parseMarketData(msg.marketData))
+      const { data, overlays } = parseData(msg)
+      addOverlays(overlays)
+      addData(data)
     })
   }
 
@@ -30,6 +31,7 @@ class App extends React.Component {
 App.propTypes = {
   data: PropTypes.array.isRequired, // eslint-disable-line
   addData: PropTypes.func.isRequired,
+  addOverlays: PropTypes.func.isRequired,
 }
 
 export default App

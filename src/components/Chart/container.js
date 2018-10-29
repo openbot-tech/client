@@ -6,6 +6,7 @@ const ChartContainer = props => <Chart {...props} />
 
 const mapStateToProps = state => ({
   data: state.data,
+  overlays: state.overlays,
 })
 
 export default connect(

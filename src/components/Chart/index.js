@@ -32,12 +32,10 @@ import { last } from 'react-stockcharts/lib/utils'
 // eslint-disable-next-line react/prefer-stateless-function
 class MovingAverageCrossOverAlgorithmV1 extends Component {
   render() {
-    const { type, data: initialData, width, ratio } = this.props
+    const { type, data: initialData, width, ratio, overlays } = this.props
 
-    const ema100 = {
-      calculate: data => data.map(obj => ({ ...obj, ema100: 250 })),
-      accessor: data => data && data.ema100,
-    }
+    const indicatorOverlays = overlays.map(({ stroke, name, indicator }) =>
+      ({ accessor: data => data && data[name], stroke, indicator }))
 
     const margin = { left: 80, right: 80, top: 30, bottom: 50 }
     const height = 400
@@ -45,15 +43,29 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
     const [yAxisLabelX, yAxisLabelY] =
       [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2]
 
-    const calculatedData = ema100.calculate(initialData)
     const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d.date)
+    /*
+              { indicatorOverlays.length > 0 && (
+            <MovingAverageTooltip
+              onClick={e => console.log(e)}
+              origin={[-38, 15]}
+              options={indicatorOverlays.map(overlay => ({
+                yAccessor: overlay.accessor,
+                type: overlay.indicator,
+                stroke: overlay.stroke,
+                windowSize: overlay.options.join(', '),
+              }))
+              }
+            />
+          )}
+    */
     const {
       data,
       xScale,
       xAccessor,
       displayXAccessor,
-    } = xScaleProvider(calculatedData)
+    } = xScaleProvider(initialData)
 
     const start = xAccessor(last(data))
     const end = xAccessor(data[Math.max(0, data.length - 150)])
@@ -75,7 +87,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
       >
         <Chart
           id={1}
-          yExtents={[d => [d.high, d.low], ema100.accessor]}
+          yExtents={[d => [d.high, d.low, ...indicatorOverlays]]}
           padding={{ top: 10, bottom: 20 }}
         >
           <XAxis axisAt="bottom" orient="bottom" />
@@ -108,7 +120,9 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <CandlestickSeries />
-          <LineSeries yAccessor={ema100.accessor} stroke="#000" />
+          {
+            indicatorOverlays.map(overlay => <LineSeries key={overlay.name} yAccessor={overlay.accessor} stroke={overlay.stroke} />)
+          }
           <EdgeIndicator
             itemType="last"
             orient="right"
@@ -118,18 +132,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
           />
 
           <OHLCTooltip origin={[-40, 0]} />
-          <MovingAverageTooltip
-            onClick={e => console.log(e)}
-            origin={[-38, 15]}
-            options={[
-              {
-                yAccessor: ema100.accessor,
-                type: 'EMA',
-                stroke: '#000',
-                windowSize: 7,
-              },
-            ]}
-          />
+
 
         </Chart>
         <CrossHairCursor />
@@ -140,6 +143,7 @@ class MovingAverageCrossOverAlgorithmV1 extends Component {
 
 MovingAverageCrossOverAlgorithmV1.propTypes = {
   data: PropTypes.array.isRequired, // eslint-disable-line
+  overlays: PropTypes.array.isRequired, // eslint-disable-line
   width: PropTypes.number.isRequired,
   ratio: PropTypes.number.isRequired,
   type: PropTypes.oneOf(['svg', 'hybrid']),
