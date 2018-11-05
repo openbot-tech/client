@@ -104,7 +104,7 @@ class ChartWrapper extends Component {
           <MouseCoordinateY
             at="right"
             orient="right"
-            displayFormat={format('.2f')}
+            displayFormat={format('.6f')}
           />
 
           <CandlestickSeries />
@@ -117,7 +117,7 @@ class ChartWrapper extends Component {
             fill={d => (d.close > d.open ? '#6BA583' : '#FF0000')}
           />
 
-          <OHLCTooltip origin={[-40, 0]} />
+          <OHLCTooltip origin={[-40, 0]} ohlcFormat={format('.6f')} />
 
           <Annotate
             with={SvgPathAnnotation}
