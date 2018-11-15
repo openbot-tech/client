@@ -168,7 +168,6 @@ class ChartWrapper extends Component {
           )
         })
         }
-
         <CrossHairCursor />
       </ChartCanvas>
     )
