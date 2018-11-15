@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import { format } from 'd3-format'
 import { LineSeries } from 'react-stockcharts/lib/series'
 import { MovingAverageTooltip } from 'react-stockcharts/lib/tooltip'
 
@@ -19,6 +20,7 @@ const Overlays = ({ indicatorOverlays }) => (
         <MovingAverageTooltip
           onClick={e => console.log(e)}
           origin={[-38, 15]}
+          displayFormat={format('.6f')}
           options={indicatorOverlays.map(overlay => ({
             key: overlay.name,
             yAccessor: overlay.accessor,
