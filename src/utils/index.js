@@ -11,6 +11,11 @@ export const colors = [
 
 const parseDate = timeParse('%s')
 
+const translateOutputNames = {
+  bbands_lower: 'bottom',
+  bbands_middle: 'middle',
+  bbands_upper: 'top',
+}
 
 export const getLast = arr => [...arr].pop()
 
@@ -32,11 +37,19 @@ export const getIndicatorsWithType = (indicatorData, type) =>
     .filter(indicator => indicator.type === type)
 
 
+export const parseIndicatorData = (indicatorData, outputNames) => {
+  if (indicatorData.length === 1 && Array.isArray(indicatorData)) return getLast(getLast(indicatorData))
+  return outputNames.reduce((acc, outputName, idx) => ({
+    ...acc,
+    [translateOutputNames[outputName] || outputName]: getLast(indicatorData[idx]),
+  }), {})
+}
+
 export const parseIndicators = indicatorData =>
   indicatorData
     .reduce((acc, indicator) => ({
       ...acc,
-      [indicator.indicatorName]: getLast(getLast(indicator.data)), // TODO FIX
+      [indicator.indicatorName]: parseIndicatorData(indicator.data, indicator.output_names),
     }), {})
 
 

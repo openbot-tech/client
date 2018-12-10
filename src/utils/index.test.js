@@ -3,6 +3,7 @@ import {
   getLast,
   parseMarketData,
   getIndicatorsWithType,
+  parseIndicatorData,
   parseIndicators,
   parseIndicatorOptions,
   parseData,
@@ -52,6 +53,14 @@ describe('Utils', () => {
     expect(getIndicatorsWithType(mockIndicators, 'overlay')).toEqual([{ type: 'overlay' }])
     expect(getIndicatorsWithType(mockIndicators, 'indicator')).toEqual([{ type: 'indicator' }])
     expect(getIndicatorsWithType(mockIndicators, 'no')).toEqual([])
+  })
+  it('Should return value for indicator or object if more than 1 output', () => {
+    const mockIndicatorsDataRsi = [[1, 2]]
+    expect(parseIndicatorData(mockIndicatorsDataRsi, ['rsi'])).toEqual(2)
+    const mockIndicatorsDataBBands = [[1, 2], [1, 3], [1, 4]]
+    const bbandsResult = { bottom: 2, middle: 3, top: 4 }
+    expect(parseIndicatorData(mockIndicatorsDataBBands, ['bbands_lower', 'bbands_middle', 'bbands_upper']))
+      .toEqual(bbandsResult)
   })
   it('Should parse indicator data', () => {
     const mockIndicators = [{ indicatorName: 'rsi7', data: [[1, 2]] }, { indicatorName: 'cci14', data: [[1, 3]] }]
