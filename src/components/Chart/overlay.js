@@ -37,7 +37,7 @@ const getTooltipComponent = (indicatorOverlays) => {
             onClick={e => console.log(e)}
             origin={[-38, 15]}
             displayFormat={format('.6f')}
-            options={indicatorOverlays.map(overlay => ({
+            options={indicatorOverlaysWithoutBB.map(overlay => ({
               key: overlay.name,
               yAccessor: overlay.accessor,
               type: overlay.indicator,
