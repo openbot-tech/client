@@ -27,7 +27,7 @@ const getLineComponent = overlay => (
 
 
 const getTooltipComponent = (indicatorOverlays) => {
-  const indicatorOverlaysWithoutBB = indicatorOverlays.filter(overlay => overlay.indicator === 'bbands')
+  const indicatorOverlaysWithoutBB = indicatorOverlays.filter(overlay => overlay.indicator !== 'bbands')
   const bbandsIndicator = indicatorOverlays.find(overlay => overlay.indicator === 'bbands')
   return (
     <Fragment>
