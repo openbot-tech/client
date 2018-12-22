@@ -17,6 +17,8 @@ const translateOutputNames = {
   bbands_lower: 'bottom',
   bbands_middle: 'middle',
   bbands_upper: 'top',
+  stoch_k: 'K',
+  stoch_d: 'D',
 }
 
 export const getLast = arr => [...arr].pop()

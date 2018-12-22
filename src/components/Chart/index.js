@@ -1,5 +1,5 @@
 
-import React, { Component } from 'react'
+import React, { Fragment, Component } from 'react'
 import PropTypes from 'prop-types'
 
 import { format } from 'd3-format'
@@ -9,6 +9,7 @@ import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
   CandlestickSeries,
   LineSeries,
+  StochasticSeries,
 } from 'react-stockcharts/lib/series'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import {
@@ -22,6 +23,7 @@ import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import {
   OHLCTooltip,
   SingleValueTooltip,
+  StochasticTooltip,
 } from 'react-stockcharts/lib/tooltip'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import { last } from 'react-stockcharts/lib/utils'
@@ -33,6 +35,10 @@ import {
 } from 'react-stockcharts/lib/annotation'
 import { createChartIndicatorObject } from '../../utils'
 import Overlays from './overlay'
+
+const stoAppearance = {
+  stroke: { ...StochasticSeries.defaultProps.stroke },
+}
 // eslint-disable-next-line react/prefer-stateless-function
 class ChartWrapper extends Component {
   render() {
@@ -156,14 +162,33 @@ class ChartWrapper extends Component {
                 orient="right"
                 displayFormat={format('.2f')}
               />
-
-              <LineSeries yAccessor={indicator.accessor} stroke={indicator.stroke} />
-              <SingleValueTooltip
-                yAccessor={indicator.accessor}
-                yLabel={`${indicator.indicator} (${indicator.options.join(', ')})`}
-                yDisplayFormat={format('.2f')}
-                origin={[-40, 15]}
-              />
+              { /* TODO extract this logic  */ }
+              { indicator.indicator === 'stoch' ? (
+                <Fragment>
+                  <StochasticSeries yAccessor={indicator.accessor} {...stoAppearance} />
+                  <StochasticTooltip
+                    origin={[-40, 15]}
+                    yAccessor={indicator.accessor}
+                    options={{
+                      windowSize: indicator.options[0],
+                      kWindowSize: indicator.options[1],
+                      dWindowSize: indicator.options[2],
+                    }}
+                    appearance={stoAppearance}
+                  />
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <LineSeries yAccessor={indicator.accessor} stroke={indicator.stroke} />
+                  <SingleValueTooltip
+                    yAccessor={indicator.accessor}
+                    yLabel={`${indicator.indicator} (${indicator.options.join(', ')})`}
+                    yDisplayFormat={format('.2f')}
+                    origin={[-40, 15]}
+                  />
+                </Fragment>
+              )
+              }
             </Chart>
           )
         })
